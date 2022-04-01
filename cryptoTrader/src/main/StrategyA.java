@@ -38,13 +38,13 @@ public class StrategyA implements Strategy{
             String currentCoin = coinList[count];
             data.getPriceForCoin(currentCoin, currentDate); //gets all the data 
             data.getMarketCapForCoin(currentCoin, currentDate);
-            data.getVolumeForCoin(currentCoin, currentDate);
+            volumeList.set(count, data.getVolumeForCoin(currentCoin, currentDate));
 
             //buying logic 
-            if ((coinPriceList.get(count) <10) && (volumeList.get(count) > 1000) && (currentCoin.equals("ADA"))){
-                result = new Object[]{"Strategy A", currentCoin, "buy", 10, coinPriceList.get(count), currentDate};
-            } else if ((coinPriceList.get(count) < 2) && (volumeList.get(count) > 200) && (currentCoin.equals("BTC"))) {
-                result = new Object[]{"Strategy A", currentCoin, "buy", 10, coinPriceList.get(count), currentDate};
+            if ((coinPriceList.get(count) >10) && (volumeList.get(count) > 1000) && (currentCoin.equals("ADA"))){
+                result = new Object[]{null, "Strategy-A", currentCoin, "buy", 10, coinPriceList.get(count), currentDate};
+            } else if ((coinPriceList.get(count) > 2) && (volumeList.get(count) > 200) && (currentCoin.equals("bitcoin"))) {
+                result = new Object[]{null, "Strategy-A", currentCoin, "buy", 10, coinPriceList.get(count), currentDate};
             } else {
                 //no trade done if rules are not met
                 return null;

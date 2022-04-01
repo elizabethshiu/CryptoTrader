@@ -11,7 +11,7 @@ public class StrategyB implements Strategy {
 
     private static String currentDate = DateTimeFormatter.ofPattern("dd-MM-yyyy").format(LocalDateTime.now());
 
-    public Result doTrade(String[] coinList, ArrayList<Double> coinPriceList) {
+    public Object[] doTrade(String[] coinList, ArrayList<Double> coinPriceList) {
         
         //get data
         DataFetcher data = new DataFetcher();
@@ -31,14 +31,14 @@ public class StrategyB implements Strategy {
             //Strategy B is focused on safe and stable long-term investments, prioritizing trades with higher 24h volumes and market caps
             for(int i = 0; i < coinList.length; i++) { // loop through all coins in coin list
                 if(data.getVolumeForCoin(coinList[i], getDateFromCurrent(1)) > 1000000000) { // if 24h market volume is greater than $1B, buy
-                    return new Result("Strategy-B", "buy", coinList[i], 15, data.getPriceForCoin(coinList[i], currentDate), currentDate);
+                    return new Object[]{null, "Strategy-B", "buy", coinList[i], 15, data.getPriceForCoin(coinList[i], currentDate), currentDate};       
                 }
                 if(data.getVolumeForCoin(coinList[i], getDateFromCurrent(1)) < 1000000) { // if 24h market volume is less than $1M, sell
-                    return new Result("Strategy-B", "sell", coinList[i], 5, data.getPriceForCoin(coinList[i], currentDate), currentDate);
+                    return new Object[]{null, "Strategy-B", "sell", coinList[i], 5, data.getPriceForCoin(coinList[i], currentDate), currentDate};
                 }
                 if(data.getMarketCapForCoin(coinList[i], currentDate) > 2000000000 * 4) { // if market cap is greater than $10B, buy 
                 // multiplication by 4 is required since the max int value in JAva is ~2 billion
-                    return new Result("Strategy-B", "buy", coinList[i], 20, data.getPriceForCoin(coinList[i], currentDate), currentDate);
+                    return new Object[]{null, "Strategy-B", "buy", coinList[i], 20, data.getPriceForCoin(coinList[i], currentDate), currentDate};
                 }
             }
 

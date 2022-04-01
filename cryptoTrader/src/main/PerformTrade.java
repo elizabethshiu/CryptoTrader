@@ -15,20 +15,21 @@ public class PerformTrade {
     //corresponding strategies are created and decide whether or not to trade, returns result
 
     //result object updates visualizations*
+    //use AvailableCryptoList to verify user entered valid cypto ID
     
     private static String currentDate = DateTimeFormatter.ofPattern("dd-MM-yyyy").format(LocalDateTime.now());
     private static ArrayList<Double> masterPriceList = new ArrayList<Double>();  //only returns pricelist, no marketcap or volume
     private static ArrayList<String> masterCoinList = UISelection.getMasterCoinList();
     private static ArrayList<TradingBroker> masterBrokerList = UISelection.getInstance().getBrokerList();
-    private static ArrayList<Object[]> masterResultsList = new ArrayList<Object[]>();
+    public static Result masterResultsList = new Result();
     
     //pressing perform trade button will:
     //get prices for all coins
     //update prices for each broker
     //broker will create a Strategy that determines whether or not to trade
     public static void initiateTrade(){
-        // getPrices(masterCoinList);
-        // updatePrices(masterBrokerList);
+        getPrices(masterCoinList);
+        updatePrices(masterBrokerList);
         createBrokerStrategy(masterBrokerList);
     }
     
@@ -90,15 +91,26 @@ public class PerformTrade {
             Strategy strat = strategyCreator.factoryMethod();
             Object[] result = strat.doTrade(currentBroker.getCoinList(), currentBroker.getPriceList());  
             if(result != null)
-                result[0] = currentBroker;    //add broker name to result from trade
-            masterResultsList.add(result);
+                result[0] = currentBroker.toString();    //add broker name to result from trade
+            masterResultsList.addResult(result);
+           
         } 
-    
+        masterResultsList.updateView();
     }
 
-    private static void updateVisualizations(Result result) {
-        Object[] resultArray = result.getResultArray();
-        
-    }
+    //do trade, returns result
+    //call update view after result is returned
+    //update view updates visualizations
+
+    //call new table view
+    //new table view calls create table in visCreateor class
+
+    //TODO
+    //add code to make sure coin entered matches gecko ID value (AvailabeCryptoList class)
+    //refine strategies (make sure they match coin ID and double check indexoutofbound stuff)
+    //histogram parse master results list and add values
+    //bring back trade log DB (maybe)
+    //in performTrade make sure broker doesnt exist before trading
+
 
 }

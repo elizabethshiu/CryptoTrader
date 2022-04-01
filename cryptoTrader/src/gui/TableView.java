@@ -1,19 +1,33 @@
-package main;
+package gui;
 import java.util.*;
 
-import utils.DataFetcher;
-package gui;
+import main.PerformTrade;
+import main.Result;
+import main.Subject;
+import utils.DataVisualizationCreator;
 
-public class TableView {
-    private ArrayList<Object[]> TableList;
 
-    public TableView(ArrayList<Object[]> masterResultsList) {
-        this.TableList = masterResultsList;
+public class TableView implements Observer{
+    private Result subject;
+
+    public TableView(Result subject){
+        this.subject = subject;
+        subject.attach(this);   //adds table to observer list
     }
-
-    public void updateVisualizations() {
-        for(int i=0; i<TableList.size();i++) {
-            
+    
+    //if master list changes
+    @Override
+    public void update(Subject changedSubject) {
+        if(changedSubject.equals(subject)){    
+            draw();
         }
     }
+
+    //re-render table
+    private void draw(){
+        Object[][] doubleArrResults = subject.getDoubleArray();
+
+        DataVisualizationCreator.createTableOutput();       //re creating table with updated results list
+    }   
+
 }

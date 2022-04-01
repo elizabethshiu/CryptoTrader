@@ -11,13 +11,15 @@ public class StrategyD implements Strategy {
 
     private static String currentDate = DateTimeFormatter.ofPattern("dd-MM-yyyy").format(LocalDateTime.now());
 
-    public Result doTrade(String[] coinList, ArrayList<Double> coinPriceList) {
+    public Object[] doTrade(String[] coinList, ArrayList<Double> coinPriceList) {
         
         //get data
         DataFetcher data = new DataFetcher();
         ArrayList<Double> priceList = new ArrayList<Double>();
         ArrayList<Double> marketCapList = new ArrayList<Double>();
         ArrayList<Double> volumeList = new ArrayList<Double>();
+
+        Object[] result = null;
 
         int count = 0;
         //loop through all coins in coin list 
@@ -32,12 +34,12 @@ public class StrategyD implements Strategy {
             double priceLastWeek = data.getPriceForCoin(currentCoin, getDateFromCurrent(7));
             if(coinPriceList.get(count) < priceLastWeek){
                 //buy
-                return new Result("Strategy D", coinList[count], "buy", 100, coinPriceList.get(count), currentDate);
+                result = new Object[]{null, "Strategy D", coinList[count], "buy", 100, coinPriceList.get(count), currentDate};
             }
             //selling logic, sell if it is 2% higher than the price a week ago 
             if(coinPriceList.get(count) > priceLastWeek * 1.02 ){
                 //sell  
-                return new Result("Strategy D", coinList[count], "sell", 100, coinPriceList.get(count), currentDate);
+                result = new Object[]{null, "Strategy D", coinList[count], "sell", 100, coinPriceList.get(count), currentDate};
             }
 
             //(String tradeBroker, String strategyName, String coin, String action, String quantity, String price, String date)
