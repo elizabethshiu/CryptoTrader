@@ -3,14 +3,16 @@ package utils;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Scanner;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
+/**
+ * @author all
+ * retrieves prices of coins from CoinGecko
+ */
 public class DataFetcher {
 
 	private JsonObject getDataForCrypto(String id, String date) {
@@ -32,15 +34,20 @@ public class DataFetcher {
 				}
 				sc.close();
 				JsonObject jsonObject = new JsonParser().parse(inline).getAsJsonObject();
-				return jsonObject;
+				return jsonObject;	
 			}
 
 		} catch (IOException e) {
-			System.out.println("Something went wrong with the API call.");
+			System.out.println("Something went wrong with the API call." + e);
 		}
 		return null;
 	}
 	
+	/**
+	 * @param id coin id
+	 * @param date date data is being retrieved
+	 * @return price for coin of the id being given on the date specified
+	 */
 	public double getPriceForCoin(String id, String date) {
 		double price = 0.0;
 		
@@ -54,6 +61,11 @@ public class DataFetcher {
 		return price;
 	}
 	
+	/**
+	 * @param id coin id
+	 * @param date date data is being retrieved
+	 * @return market cap for coin of the id being given on the date specified
+	 */
 	public double getMarketCapForCoin(String id, String date) {
 		double marketCap = 0.0;
 		
@@ -67,6 +79,11 @@ public class DataFetcher {
 		return marketCap;
 	}
 	
+	/**
+	 * @param id coin id
+	 * @param date date data is being retrieved
+	 * @return volume for coin of the id being given on the date specified
+	 */
 	public double getVolumeForCoin(String id, String date) {
 		double volume = 0.0;
 		

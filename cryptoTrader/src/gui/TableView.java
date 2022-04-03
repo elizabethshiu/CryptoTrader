@@ -1,21 +1,30 @@
 package gui;
-import java.util.*;
 
-import main.PerformTrade;
 import main.Result;
 import main.Subject;
 import utils.DataVisualizationCreator;
 
+/**
+ * This class represents the table visualization, it is a component of the Observer design pattern
+ */
 
 public class TableView implements Observer{
     private Result subject;
 
+    /** 
+     * Table constructor
+     * @param subject
+     * add table to observer list
+     */
     public TableView(Result subject){
         this.subject = subject;
-        subject.attach(this);   //adds table to observer list
+        subject.attach(this);
     }
     
-    //if master list changes
+    /**
+     * if master list changes, update
+     * @param changedSubject
+     */
     @Override
     public void update(Subject changedSubject) {
         if(changedSubject.equals(subject)){    
@@ -23,11 +32,11 @@ public class TableView implements Observer{
         }
     }
 
-    //re-render table
+    /**
+     * recreate table with updated results list
+     */
     private void draw(){
-        Object[][] doubleArrResults = subject.getDoubleArray();
-
-        DataVisualizationCreator.createTableOutput();       //re creating table with updated results list
+        DataVisualizationCreator.createTableOutput();  
     }   
 
 }

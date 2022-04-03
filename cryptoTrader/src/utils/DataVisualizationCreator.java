@@ -1,11 +1,14 @@
 package utils;
 import gui.MainUI;
-import main.Result;
-import main.PerformTrade;
 
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.HashMap;
 
 import javax.swing.BorderFactory;
 import javax.swing.JScrollPane;
@@ -30,38 +33,31 @@ import org.jfree.data.time.Day;
 import org.jfree.data.time.TimeSeries;
 import org.jfree.data.time.TimeSeriesCollection;
 
+/**
+ * @author all
+ * This class creates the trade history table and trade frequency histogram
+ */
 
 public class DataVisualizationCreator {
 	
 	private static Object[] columnNames = {"Trader","Strategy","CryptoCoin","Action","Quantity","Price","Date"};
 	private DefaultTableModel model = new DefaultTableModel(columnNames, 0);	//added this tablemodel to JTable so we can add rows later on 
-    // Create the JTable
-    private JTable table = new JTable(model);
+	private static HashMap<String, Integer> tradeCount = new HashMap<String, Integer>();
 
+	/**
+	 * Create visualizations
+	 */
 	public void createCharts() {
 		createTableOutput();
 		createBar();
 	}
 	
+	/**
+	 * Create table with trade history
+	 */
 	public static void createTableOutput() {
-		Object[][] resultData = PerformTrade.masterResultsList.getDoubleArray();
-		// Dummy dates for demo purposes. These should come from selection menu
 		
-		// Dummy data for demo purposes. These should come from actual fetcher
-		// Object[][] data = {
-		// 		{"Trader-1", "Strategy-A", "ETH", "Buy", "500", "150.3","13-January-2022"},
-		// 		{"Trader-2", "Strategy-B", "BTC", "Sell", "200", "50.2","13-January-2022"},
-		// 		{"Trader-3", "Strategy-C", "USDT", "Buy", "1000", "2.59","15-January-2022"},
-		// 		{"Trader-1", "Strategy-A", "USDC", "Buy", "500", "150.3","16-January-2022"},
-		// 		{"Trader-2", "Strategy-B", "ADA", "Sell", "200", "50.2","16-January-2022"},
-		// 		{"Trader-3", "Strategy-C", "SOL", "Buy", "1000", "2.59","17-January-2022"},
-		// 		{"Trader-1", "Strategy-A", "ONE", "Buy", "500", "150.3","17-January-2022"},
-		// 		{"Trader-2", "Strategy-B", "MANA", "Sell", "200", "50.2","17-January-2022"},
-		// 		{"Trader-3", "Strategy-C", "AVAX", "Buy", "1000", "2.59","19-January-2022"},
-		// 		{"Trader-1", "Strategy-A", "LUNA", "Buy", "500", "150.3","19-January-2022"},
-		// 		{"Trader-2", "Strategy-B", "FTM", "Sell", "200", "50.2","19-January-2022"},
-		// 		{"Trader-3", "Strategy-C", "HNT", "Buy", "1000", "2.59","20-January-2022"}
-		// };
+		Object[][] resultData = readResults();
 		
 		JTable table = new JTable(resultData, columnNames); //takes masterlist and makes table
 
@@ -72,31 +68,28 @@ public class DataVisualizationCreator {
                 "Trader Actions",
                 TitledBorder.CENTER,
                 TitledBorder.TOP));
-		
-	
-		
 		scrollPane.setPreferredSize(new Dimension(800, 300));
 		table.setFillsViewportHeight(true);;
 		
 		MainUI.getInstance().updateStats(scrollPane);
 	}
 	
-	
+	/**
+	 * Create histogram showing trade frequency for each trader by strategy
+	 */
 	public static void createBar() {
 		
 		DefaultCategoryDataset dataset = new DefaultCategoryDataset();
-		Object[][] resultData = PerformTrade.masterResultsList.getDoubleArray();
-//		Those are hard-coded values!!!! 
-//		You will have to come up with a proper datastructure to populate the BarChart with live data!
-		//dataset.setValue(6, "Trader-1", "Strategy-A");
-		//dataset.setValue(5, "Trader-2", "Strategy-B");
-		//dataset.setValue(0, "Trader-3", "Strategy-E");
-		//dataset.setValue(1, "Trader-4", "Strategy-C");
-		//dataset.setValue(10, "Trader-5", "Strategy-D");
-		dataset.setValue(2, resultData[0][0].toString(), resultData[0][1].toString());
-		// for (int i = 0; i<resultData.length; i++){	//for each result
+		Object[][] resultData = readResults();
 
-		// }
+		for (int i=0; i<resultData.length;i++) {
+			if(resultData[i][0] != null) {
+				String traderName = resultData[i][0].toString();
+				dataset.setValue(tradeCount.get(traderName), traderName, resultData[i][1].toString());
+			} else {
+				break;
+			}
+		}
 
 		CategoryPlot plot = new CategoryPlot();
 		BarRenderer barrenderer1 = new BarRenderer();
@@ -122,4 +115,50 @@ public class DataVisualizationCreator {
 		MainUI.getInstance().updateStats(chartPanel);
 	}
 
+	/**
+	 * Reads and returns trade history from stored file
+	 */
+	private static Object[][] readResults() {
+		Object[][] resultData = new Object[250][7];
+
+		BufferedReader objReader = null;
+		try {
+			String strCurrentLine;
+			String filePath = new File("").getAbsolutePath();
+			objReader = new BufferedReader(new FileReader(filePath + "/TradingBroker.txt"));
+			int i = 0;
+				while ((strCurrentLine = objReader.readLine()) != null) {         	
+					
+					resultData[i][0] = strCurrentLine;
+					String traderName = (String) resultData[i][0]; //cast to string
+					resultData[i][1] = objReader.readLine();
+					resultData[i][2] = objReader.readLine();
+					resultData[i][3] = objReader.readLine();
+					resultData[i][4] = objReader.readLine();
+					resultData[i][5] = objReader.readLine();
+					resultData[i][6] = objReader.readLine();					
+					System.out.println(resultData[i].toString());
+					i += 1;
+					if(tradeCount.get(traderName) == null) {	//if trader is not in dictionary
+						tradeCount.put(traderName, 1);
+					} else {
+						int numTrades = tradeCount.get(traderName);
+						tradeCount.replace(traderName, numTrades + 1);
+					}
+				}
+			return resultData;
+			
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (objReader != null) {
+					objReader.close();
+				}
+			} catch (IOException ex) {
+				ex.printStackTrace();
+			}
+		}
+			return null;
+	}
 }

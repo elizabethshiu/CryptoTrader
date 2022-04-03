@@ -1,3 +1,9 @@
+/**
+ * This class serves as the login UI window, and also verifies user credentials using the users.txt file
+ * It implements a singleton design pattern
+ * @author all
+ */
+
 package main;
 import java.awt.*;
 import java.awt.event.*;
@@ -6,6 +12,9 @@ import java.io.*;
 
 import gui.MainUI;
 
+/**
+ * Login UI for user to log in
+ */
 public class LoginUI extends JFrame implements ActionListener {
     private static LoginUI instance = null;
 
@@ -15,7 +24,9 @@ public class LoginUI extends JFrame implements ActionListener {
     JPasswordField password_text;
     JButton submit, cancel;
     
-    //constructor
+    /**
+     * constructor for LoginUI
+     */
     private LoginUI() {     
         
         // Username Label
@@ -40,7 +51,7 @@ public class LoginUI extends JFrame implements ActionListener {
         panel.add(submit);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         
-        // Adding the listeners to components..
+        // Adding the listeners to components
         submit.addActionListener(this);
         add(panel, BorderLayout.CENTER);
         setTitle("Please Login Here !");
@@ -49,7 +60,10 @@ public class LoginUI extends JFrame implements ActionListener {
         
     }
 
-    //on Login button click
+    /**
+     * @param ae and action evente
+     * on Login button click verify user
+    */
     @Override
     public void actionPerformed(ActionEvent ae) {
         String userName = userName_text.getText();
@@ -68,6 +82,13 @@ public class LoginUI extends JFrame implements ActionListener {
         }
     }
 
+    /**
+     * @param username the user username
+     * @param pasword the user password
+     * @return if the user input the correct login credentials or not
+     * check users.txt if the given password matches the username
+     */ 
+
     public boolean verifyUser(String username, String password) {
 
         BufferedReader objReader = null;
@@ -76,10 +97,11 @@ public class LoginUI extends JFrame implements ActionListener {
             String filePath = new File("").getAbsolutePath();
             objReader = new BufferedReader(new FileReader(filePath + "/cryptoTrader/src/users.txt"));
 
+            //parse users.txt file
             while ((strCurrentLine = objReader.readLine()) != null) {
-                if(username.equals(strCurrentLine)){
+                if(username.equals(strCurrentLine)){        //if given username matches one in the file
                     strCurrentLine = objReader.readLine();
-                    if(password.equals(strCurrentLine)) {
+                    if(password.equals(strCurrentLine)) {   //check if given password matches coresponding password in file
                         return true;
                     }
                 }
@@ -102,6 +124,9 @@ public class LoginUI extends JFrame implements ActionListener {
         return false;
     }
 
+    /**
+     *retrieves the login UI instance
+     */
     public static LoginUI getInstance() {
         if(instance == null)
             instance = new LoginUI();

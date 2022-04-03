@@ -1,3 +1,9 @@
+/**
+ * @author all
+ * Trade strategy for Strategy A.
+ * Performs trade if requiremtns are met, otherwise trade is not performed
+*/
+
 package main;
 import java.util.*;
 
@@ -38,16 +44,15 @@ public class StrategyA implements Strategy{
             String currentCoin = coinList[count];
             data.getPriceForCoin(currentCoin, currentDate); //gets all the data 
             data.getMarketCapForCoin(currentCoin, currentDate);
-            volumeList.set(count, data.getVolumeForCoin(currentCoin, currentDate));
-
+        
             //buying logic 
-            if ((coinPriceList.get(count) >10) && (volumeList.get(count) > 1000) && (currentCoin.equals("ADA"))){
+            if ((coinPriceList.get(count) >10)){
                 result = new Object[]{null, "Strategy-A", currentCoin, "buy", 10, coinPriceList.get(count), currentDate};
-            } else if ((coinPriceList.get(count) > 2) && (volumeList.get(count) > 200) && (currentCoin.equals("bitcoin"))) {
+            } else if ((coinPriceList.get(count) > 2)) {
                 result = new Object[]{null, "Strategy-A", currentCoin, "buy", 10, coinPriceList.get(count), currentDate};
             } else {
                 //no trade done if rules are not met
-                return null;
+                System.out.println("No suitable trade");
             }
 
             count++;

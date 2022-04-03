@@ -13,12 +13,19 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
+/**
+ * retrieves list of available cryptocoins
+ */
+
 public class AvailableCryptoList {
 	private static AvailableCryptoList instance = null;
 	
 	private Map<String, String> availableCryptosMap = new HashMap<>();
 	private List<String> availableCryptosList = new ArrayList<>();
 	
+	/**
+	 * Singleton design pattern implementation for AvailableCryptoList
+	 */
 	public static AvailableCryptoList getInstance() {
 		if (instance == null)
 			instance = new AvailableCryptoList();
@@ -26,10 +33,16 @@ public class AvailableCryptoList {
 		return instance;
 	}
 	
+	/**
+	 * calls dinsAvailableCryptos methos
+	 */
 	private AvailableCryptoList() {
 		findAvailableCryptos();
 	}
 	
+	/**
+	 * connects to url of data
+	 */
 	public void call() {
 		String urlString = "https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=IBM&apikey=VNEY4VV2AWF1EB51";
 		try {
@@ -64,7 +77,9 @@ public class AvailableCryptoList {
 			// TODO Auto-generated catch block e.printStackTrace();
 		}
 	}
-	
+	/**
+	 * connects to CoinGecko API to retrieve cryptocoin information
+	 */
 	private void findAvailableCryptos() {
 
 		String urlString = 
@@ -103,10 +118,17 @@ public class AvailableCryptoList {
 		}
 	}
 	
+	/**
+	 * @return List of available cryptocoins
+	 */
 	public String[] getAvailableCryptos() {
 		return availableCryptosList.toArray(new String[availableCryptosList.size()]);
 	}
 	
+	/**
+	 * @param cryptoName name of cryptocoin
+	 * @return ID for the given cryptocoin
+	 */
 	public String getCryptoID(String cryptoName) {
 		return availableCryptosMap.get(cryptoName);
 	}

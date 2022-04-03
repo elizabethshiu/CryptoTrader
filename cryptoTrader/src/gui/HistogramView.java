@@ -1,20 +1,29 @@
 package gui;
-import java.util.*;
 
-import main.PerformTrade;
 import main.Result;
 import main.Subject;
 import utils.DataVisualizationCreator;
-
+/**
+ * Histogram view class, with observer design pattern
+ * @author all
+ */
 public class HistogramView implements Observer{
     private Result subject;
 
+    /** 
+     * Histogram constructor
+     * @param subject
+     * add histogram to observer list
+     */
     public HistogramView(Result subject){
         this.subject = subject;
-        subject.attach(this);   //adds table to observer list
+        subject.attach(this);
     }
     
-    //if master list changes
+    /**
+     * if master list changes, update
+     * @param changedSubject
+     */
     @Override
     public void update(Subject changedSubject) {
         if(changedSubject.equals(subject)){    
@@ -22,11 +31,11 @@ public class HistogramView implements Observer{
         }
     }
 
-    //re-render table
+    /**
+     * recreate table with updated results list
+     */
     private void draw(){
-        Object[][] doubleArrResults = subject.getDoubleArray();
-
-        DataVisualizationCreator.createBar();       //re creating table with updated results list
+        DataVisualizationCreator.createBar();
     }   
 
 }

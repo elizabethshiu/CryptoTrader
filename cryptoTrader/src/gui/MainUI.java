@@ -28,92 +28,56 @@ import javax.swing.border.TitledBorder;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 
+import utils.AvailableCryptoList;
 import utils.DataVisualizationCreator;
 import main.PerformTrade;
 import main.TradingBroker;
 import main.UISelection;
 
+/**
+ * This class represents the main UI of the app and implements a Singleton design pattern
+ * @author all
+ */
 
 public class MainUI extends JFrame implements ActionListener {
-	/**
-	 * 
-	 */
+	
 	private static final long serialVersionUID = 1L;
 
 	private static MainUI instance;
-	private JPanel stats, chartPanel, tablePanel;
+	private JPanel stats;
 
-	// Should be a reference to a separate object in actual implementation
-	private List<String> selectedList;
-
-	private JTextArea selectedTickerList;
-//	private JTextArea tickerList;
-	private JTextArea tickerText;
-	private JTextArea BrokerText;
-	private JComboBox<String> strategyList;
-	private Map<String, List<String>> brokersTickers = new HashMap<>();
-	private Map<String, String> brokersStrategies = new HashMap<>();
-	private List<String> selectedTickers = new ArrayList<>();
-	private String selectedStrategy = "";
 	private DefaultTableModel dtm;
 	private JTable table;
 
 	private ArrayList<String> masterList = UISelection.getMasterCoinList();
+	private AvailableCryptoList cryptolist = AvailableCryptoList.getInstance();
+    private List<String> availableCoins = Arrays.asList(cryptolist.getAvailableCryptos());		//list of available cryptocoins
 
+	/**
+	 * Fetches the mainUI instance if exists, if not creates a new one
+	 * @return
+	 */
 	public static MainUI getInstance() {
 		if (instance == null)
 			instance = new MainUI();
 
 		return instance;
 	}
-
+	
+	/**
+	 * Constructor for MainUI
+	 */
 	private MainUI() {
 
 		// Set window title
 		super("Crypto Trading Tool");
 
 		// Set top bar
-
-
 		JPanel north = new JPanel();
-
-//		north.add(strategyList);
-
-		// Set bottom bar
-//		JLabel from = new JLabel("From");
-//		UtilDateModel dateModel = new UtilDateModel();
-//		Properties p = new Properties();
-//		p.put("text.today", "Today");
-//		p.put("text.month", "Month");
-//		p.put("text.year", "Year");
-//		JDatePanelImpl datePanel = new JDatePanelImpl(dateModel, p);
-//		@SuppressWarnings("serial")
-//		JDatePickerImpl datePicker = new JDatePickerImpl(datePanel, new AbstractFormatter() {
-//			private String datePatern = "dd/MM/yyyy";
-//
-//			private SimpleDateFormat dateFormatter = new SimpleDateFormat(datePatern);
-//
-//			@Override
-//			public Object stringToValue(String text) throws ParseException {
-//				return dateFormatter.parseObject(text);
-//			}
-//
-//			@Override
-//			public String valueToString(Object value) throws ParseException {
-//				if (value != null) {
-//					Calendar cal = (Calendar) value;
-//					return dateFormatter.format(cal.getTime());
-//				}
-//
-//				return "";
-//			}
-//		});
 
 		JButton trade = new JButton("Perform Trade");
 		trade.setActionCommand("refresh");
 		trade.addActionListener(this);
-
-
 
 		JPanel south = new JPanel();
 		
@@ -121,7 +85,6 @@ public class MainUI extends JFrame implements ActionListener {
 
 		dtm = new DefaultTableModel(new Object[] { "Trading Client", "Coin List", "Strategy Name" }, 1);
 		table = new JTable(dtm);
-		// table.setPreferredSize(new Dimension(600, 300));
 		JScrollPane scrollPane = new JScrollPane(table);
 		scrollPane.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), "Trading Client Actions",
 				TitledBorder.CENTER, TitledBorder.TOP));
@@ -144,19 +107,14 @@ public class MainUI extends JFrame implements ActionListener {
 		scrollPane.setPreferredSize(new Dimension(800, 300));
 		table.setFillsViewportHeight(true);
 		
-
 		JPanel east = new JPanel();
-//		east.setLayout();
 		east.setLayout(new BoxLayout(east, BoxLayout.Y_AXIS));
-//		east.add(table);
 		east.add(scrollPane);
 		JPanel buttons = new JPanel();
 		buttons.setLayout(new BoxLayout(buttons, BoxLayout.X_AXIS));
 		buttons.add(addRow);
 		buttons.add(remRow);
 		east.add(buttons);
-//		east.add(selectedTickerListLabel);
-//		east.add(selectedTickersScrollPane);
 
 		// Set charts region
 		JPanel west = new JPanel();
@@ -170,7 +128,6 @@ public class MainUI extends JFrame implements ActionListener {
 		getContentPane().add(east, BorderLayout.EAST);
 		getContentPane().add(west, BorderLayout.CENTER);
 		getContentPane().add(south, BorderLayout.SOUTH);
-//		getContentPane().add(west, BorderLayout.WEST);
 	}
 
 	public void updateStats(JComponent component) {
@@ -211,15 +168,27 @@ public class MainUI extends JFrame implements ActionListener {
 						return;
 					}
 					String strategyName = strategyObject.toString();
+					
+
 					for(int i = 0; i < coinNames.length; i++){	//everytime you press perform trade
-						if (!masterList.contains(coinNames[i]))
-							masterList.add(coinNames[i]);	   //add new coins to master coin list
+						String coinID = null;
+						String currentCoin = coinNames[i];
+						//if coin is supported or already matches ID
+						if(availableCoins.contains(currentCoin) || currentCoin.equals(cryptolist.getCryptoID(currentCoin))){
+							coinID = cryptolist.getCryptoID(currentCoin);
+							coinNames[i] = coinID;		//set name in coin list to ID
+						} else {
+							JOptionPane.showMessageDialog(this, currentCoin + " not recognized, please enter a recognized coin name.");
+							return;
+						}
+						
+						//add coin by ID
+						if (coinID != null && !masterList.contains(coinID))
+							masterList.add(coinID);	   //add new coins to master coin list
 					}
 					
 					TradingBroker broker = new TradingBroker(traderName, strategyName, coinNames);
 					UISelection.getInstance().addTradingBroker(broker, strategyName, coinNames);
-
-					
 
 					System.out.println(traderName + " " + Arrays.toString(coinNames) + " " + strategyName);
 	        }

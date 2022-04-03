@@ -1,35 +1,35 @@
+/**
+ * @author all
+ * Trade strategy for Strategy D.
+ * Performs trade if requirements are met, otherwise trade is not performed
+*/
+
 package main;
 import java.util.*;
 
 import utils.DataFetcher;
 
-import java.io.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 public class StrategyD implements Strategy {
 
-    private static String currentDate = DateTimeFormatter.ofPattern("dd-MM-yyyy").format(LocalDateTime.now());
+    private static String currentDate = DateTimeFormatter.ofPattern("dd-MM-yyyy").format(LocalDateTime.now());  //keep track of current date
 
     public Object[] doTrade(String[] coinList, ArrayList<Double> coinPriceList) {
         
-        //get data
+        //get data from datafetcher object 
         DataFetcher data = new DataFetcher();
-        ArrayList<Double> priceList = new ArrayList<Double>();
-        ArrayList<Double> marketCapList = new ArrayList<Double>();
-        ArrayList<Double> volumeList = new ArrayList<Double>();
 
         Object[] result = null;
 
         int count = 0;
+        String currentCoin = null;  //set currentCoin to null
         //loop through all coins in coin list 
         while(count<coinList.length){
-            String currentCoin = coinList[count];
-            data.getPriceForCoin(currentCoin, currentDate); //gets all the data 
-            data.getMarketCapForCoin(currentCoin, currentDate);
-            data.getVolumeForCoin(currentCoin, currentDate);
-            //buying logic 
+            currentCoin = coinList[count];
 
+            //trading logic 
             //get price from a week ago
             double priceLastWeek = data.getPriceForCoin(currentCoin, getDateFromCurrent(7));
             if(coinPriceList.get(count) < priceLastWeek){
@@ -37,22 +37,24 @@ public class StrategyD implements Strategy {
                 result = new Object[]{null, "Strategy D", coinList[count], "buy", 100, coinPriceList.get(count), currentDate};
             }
             //selling logic, sell if it is 2% higher than the price a week ago 
-            if(coinPriceList.get(count) > priceLastWeek * 1.02 ){
+            else if(coinPriceList.get(count) > priceLastWeek * 1.02 ){
                 //sell  
                 result = new Object[]{null, "Strategy D", coinList[count], "sell", 100, coinPriceList.get(count), currentDate};
+            }else{
+                System.out.println("No suitable trade");
             }
-
-            //(String tradeBroker, String strategyName, String coin, String action, String quantity, String price, String date)
-            count++;
+            count++;    //go to next coin
         }
         
-        //if no trade, return null 
-        return null;
+        //return trade
+        return result;
 
     }
-
-     
-    //get the date from input days ago 
+    
+    /**
+     * gets date from specified number of days ago 
+     * @param days
+     */
     public String getDateFromCurrent(long days){
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd-MM-yyyy");
         LocalDateTime newDate = LocalDateTime.now().minusDays(days);
