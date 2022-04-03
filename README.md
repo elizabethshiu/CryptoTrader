@@ -6,4 +6,4 @@ mvn install
 ```
 must be run to install all necessary dependencies.
 
-Afterward run main.java to start the program.
+Afterward run main.java in a compiler to start the program.
